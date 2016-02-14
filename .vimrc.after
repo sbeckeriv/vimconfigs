@@ -1,0 +1,158 @@
+:imap jj <Esc>
+let g:ycm_rust_src_path ="/Users/becker/trash/rust/src"
+let g:rustfmt_autosave = 1
+let g:formatdef_rustfmt = '"rustfmt"'
+let g:formatters_rust = ['rustfmt']
+au BufWrite * :Autoformat
+set foldmethod=indent "fold based on indent
+set foldnestmax=10 "deepest fold is 10 levels
+set nofoldenable "dont fold by default
+set foldlevel=1 "this is just what i use
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+let g:markdown_fenced_languages = ['html', 'python', 'bash=sh', 'rust', 'ruby']
+if bufwinnr(1)
+  nnoremap <S-Up> :normal <c-r>=Resize('+')<CR><CR>
+  nnoremap <S-Down> :normal <c-r>=Resize('-')<CR><CR>
+  nnoremap <S-Left> :normal <c-r>=Resize('<')<CR><CR>
+  nnoremap <S-Right> :normal <c-r>=Resize('>')<CR><CR>
+  map <silent> <leader>cf :!touch <c-r><c-p><cr><cr>
+  function! Resize(dir)
+  let this = winnr()
+  if '+' == a:dir || '-' == a:dir
+    execute "normal \<c-w>k"
+    let up = winnr()
+    if up != this
+      execute "normal \<c-w>j"
+      let x = 'bottom'
+    else
+      let x = 'top'
+    endif
+  elseif '>' == a:dir || '<' == a:dir
+    execute "normal \<c-w>h"
+    let left = winnr()
+    if left != this
+      execute "normal \<c-w>l"
+      let x = 'right'
+    else
+      let x = 'left'
+    endif
+  endif
+  if ('+' == a:dir && 'bottom' == x) || ('-' == a:dir && 'top' == x)
+    return "5\<c-v>\<c-w>+"
+  elseif ('-' == a:dir && 'bottom' == x) || ('+' == a:dir && 'top' == x)
+    return "5\<c-v>\<c-w>-"
+  elseif ('<' == a:dir && 'left' == x) || ('>' == a:dir && 'right' == x)
+    return "5\<c-v>\<c-w><"
+  elseif ('>' == a:dir && 'left' == x) || ('<' == a:dir && 'right' == x)
+    return "5\<c-v>\<c-w>>"
+  else
+    echo "oops. check your ~/.vimrc"
+    return ""
+  endif
+endfunction
+" /*}}}*/
+endif
+
+autocmd BufWritePost *
+      \ if filereadable('tags') |
+      \ call system('ctags -a '.expand('%')) |
+      \ endif
+set wrap
+set cmdheight=5
+set scrolloff=9999
+set cryptmethod=blowfish
+
+command! -complete=shellcmd -nargs=+ B call s:RunShellCommand(<q-args>)
+function! s:RunShellCommand(cmdline)
+echo a:cmdline
+let expanded_cmdline = a:cmdline
+for part in split(a:cmdline, ' ')
+  if part[0] =~ '\v[%#<]'
+    let expanded_part = fnameescape(expand(part))
+    let expanded_cmdline = substitute(expanded_cmdline, part, expanded_part, '')
+  endif
+endfor
+botright new
+
+setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+
+call setline(1, 'You entered: ' . a:cmdline)
+call setline(2, 'Expanded Form: ' .expanded_cmdline)
+call setline(3,substitute(getline(2),'.','=','g'))
+execute '$read !'. expanded_cmdline
+setlocal nomodifiable
+1
+endfunction
+
+set wildignore+=*.png,*.jpg,*.gif,*.ai,*.jpeg,*.psd,*.swp,*.jar,*.zip,*.gem,.DS_Store,log/**,tmp/**,coverage/**,rdoc/**,output_*,*.xpi,doc/**
+set wildmode=longest,list:longest
+
+set completeopt=menu,preview
+
+nnoremap gr :Ack <C-r><C-w><CR>
+nnoremap gt :Ack -Q "def <C-r><C-w>"<CR>
+set nolist
+set clipboard=unnamed
+command RemoveMultipleBlankLines %s/^\(\s*\n\)\+/\r
+command CovertRspecExpects %s/\(\S\+\)\.should ==\s\=\(.*\)/expect(\1).to eq(\2)/
+
+function! QuickFixOpenAll()
+if empty(getqflist())
+  return
+endif
+let s:prev_val = ""
+for d in getqflist()
+  let s:curr_val = bufname(d.bufnr)
+  if (s:curr_val != s:prev_val)
+    exec "edit " . s:curr_val
+  endif
+  let s:prev_val = s:curr_val
+endfor
+endfunction
+command! QuickFixOpenAll call QuickFixOpenAll()
+autocmd BufWritePre * :%s/\s\+$//e
+map <C-c> y:e ~/clipsongzboard<CR>P:w !pbcopy<CR><CR>:bdelete!<CR>
+set spell
+au VimEnter * RainbowParenthesesToggleAll
+set iskeyword+=-
+set iskeyword+=!
+set iskeyword+=?
+au FileType haml set cursorcolumn
+au FileType slim set cursorcolumn
+nnoremap Q <nop>
+
+let g:rbpt_colorpairs = [
+      \ ['brown', 'RoyalBlue3'],
+      \ ['Darkblue', 'SeaGreen3'],
+      \ ['darkgray', 'DarkOrchid3'],
+      \ ['darkgreen', 'firebrick3'],
+      \ ['darkcyan', 'RoyalBlue3'],
+      \ ['darkred', 'SeaGreen3'],
+      \ ['darkmagenta', 'DarkOrchid3'],
+      \ ['brown', 'firebrick3'],
+      \ ['gray', 'RoyalBlue3'],
+      \ ['darkmagenta', 'DarkOrchid3'],
+      \ ['Darkblue', 'firebrick3'],
+      \ ['darkgreen', 'RoyalBlue3'],
+      \ ['darkcyan', 'SeaGreen3'],
+      \ ['darkred', 'DarkOrchid3'],
+      \ ['red', 'firebrick3'],
+      \ ]
+
+nnoremap <Leader>q" ciw""<Esc>P
+nnoremap <Leader>q' ciw''<Esc>P
+set history=3000
+colorscheme railscasts
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-p>"
+let g:SuperTabCompletionContexts = ['s:ContextText', 's:ContextDiscover']
+let g:SuperTabContextDiscoverDiscovery = ["&omnifunc:<c-x><c-o>"]
+" Problem with load order (vimrc is evaluated before latex-box setting of omnifunc)
+" \ verbose set omnifunc? | " is empty
+" added this autocommand to after/ftplugin/tex.vim
+" :do FileType solves also the problem
+autocmd FileType *
+      \ if &omnifunc != '' |
+      \ call SuperTabChain(&omnifunc, "<c-p>") |
+      \ call SuperTabSetDefaultCompletionType("<c-x><c-u>") |
+      \ endif

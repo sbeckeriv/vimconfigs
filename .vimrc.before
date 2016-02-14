@@ -1,0 +1,22 @@
+let g:racer_cmd = "/Users/becker/.cargo/bin/racer"
+let $RUST_SRC_PATH="/Users/becker/trash/rust/src"
+let mapleader = ","
+set hlsearch " Highlight searches
+set incsearch " Do incremental searching
+set expandtab
+set tabstop=2 shiftwidth=2 softtabstop=2
+set autoindent
+map <silent><F8> :NERDTree<CR>
+"map <tab> :tabn<CR>
+set spell
+set history=3000
+set showcmd
+map <D-P> :NERDTreeToggle<CR>
+map vv :CtrlP<CR>
+set wildignore+=*.png,*.jpg,*.gif,*.ai,*.jpeg,*.psd,*.swp,*.jar,*.zip,*.gem,.DS_Store,log/**,tmp/**,coverage/**,rdoc/**,output_*,*.xpi,doc/**
+command -nargs=1 C CoffeeCompile | :<args>
+set undofile " Save undo's after file closes
+set undodir=$HOME/.vim/undo " where to save undo histories
+set undolevels=1000 " How many undos
+set undoreload=10000 " number of lines to save for undo
+
